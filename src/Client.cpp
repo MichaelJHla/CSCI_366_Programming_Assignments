@@ -44,7 +44,10 @@ void Client::initialize(unsigned int player, unsigned int board_size){
 
 
 void Client::fire(unsigned int x, unsigned int y) {
-
+    //Serialize the shot data to the shot.json file
+    std:: ofstream shotFile("player_" + to_string(player) + ".shot.json");
+    cereal::JSONOutputArchive cerealArchive(shotFile);
+    cerealArchive(CEREAL_NVP(x), CEREAL_NVP(y));
 }
 
 
