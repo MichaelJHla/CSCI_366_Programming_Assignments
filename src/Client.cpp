@@ -66,16 +66,16 @@ void Client::update_action_board(int result, unsigned int x, unsigned int y) {
 //This method reads a JSON file and deserializes the JSON
 //It then converts the information to a string and returns that string
 string Client::render_action_board(){
-    ifstream fileName(to_string(this->player) + ".action_board.json"); //Creates input stream from file
+    ifstream fileName(to_string(player) + ".action_board.json"); //Creates input stream from file
     cereal::JSONInputArchive readFile(fileName); //deserialize the file
 
     //2D vector to store the file information
-    vector<vector<int>> board(this->board_size, vector<int> (this->board_size, 0));
+    vector<vector<int>> board(board_size, vector<int> (board_size, 0));
     readFile(board); //outputs the deserialized file to the board vector
 
     string boardString;//String that will store the board
-    for (int i = 0; i < this->board_size; i++){
-        for (int j = 0; j < this->board_size; j++){
+    for (int i = 0; i < board_size; i++){
+        for (int j = 0; j < board_size; j++){
             boardString += std::to_string(board[i][j]);
         }
         boardString += "\n";//Starts a new line after a row is finished
