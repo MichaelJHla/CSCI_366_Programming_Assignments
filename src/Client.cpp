@@ -22,7 +22,24 @@ Client::~Client() {
 
 
 void Client::initialize(unsigned int player, unsigned int board_size){
+    if (player==2 || player==1){ //Checks if the player number is valid
+        this->player = player; //Assign valid player number to global player
+        this->board_size = board_size; //assign board_size to global board_size
 
+        //create 2D vector for the board
+        vector<vector<int>> board(this->board_size, vector<int> (this->board_size, 0));
+
+        //creates an output stream with the file name
+        std::ofstream fileName("player_" + to_string(player) + ".action_board.json");
+
+        //Serialize blank data to the file
+        cereal::JSONOutputArchive cerealArchive(fileName);
+        cerealArchive(CEREAL_NVP(board));
+
+        initialized = true; //Notify the loop that the client has been initialized
+    } else {
+        throw ClientWrongPlayerNumberException(); //if not valid throw exception
+    }
 }
 
 
@@ -63,5 +80,5 @@ string Client::render_action_board(){
         }
         boardString += "\n";//Starts a new line after a row is finished
     }
-    return boardString;//Returns the baord as a string
+    return boardString;//Returns the board as a string
 }
