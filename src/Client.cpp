@@ -30,7 +30,7 @@ void Client::initialize(unsigned int player, unsigned int board_size){
         vector<vector<int>> board(this->board_size, vector<int> (this->board_size, 0));
 
         //creates an output stream with the file name
-        std::ofstream fileName("player_" + to_string(player) + ".action_board.json");
+        ofstream fileName("player_" + to_string(player) + ".action_board.json");
 
         //Serialize blank data to the file
         cereal::JSONOutputArchive cerealArchive(fileName);
@@ -45,19 +45,21 @@ void Client::initialize(unsigned int player, unsigned int board_size){
 
 void Client::fire(unsigned int x, unsigned int y) {
     //Serialize the shot data to the shot.json file
-    std:: ofstream shotFile("player_" + to_string(player) + ".shot.json");
+    ofstream shotFile("player_" + to_string(player) + ".shot.json");
     cereal::JSONOutputArchive cerealArchive(shotFile);
     cerealArchive(CEREAL_NVP(x), CEREAL_NVP(y));
 }
 
 
 bool Client::result_available() {
-
+    return true; //Temporary placeholder so get_result throws no errors
 }
 
 
 int Client::get_result() {
+    if (result_available()){
 
+    }
 }
 
 
@@ -79,7 +81,7 @@ string Client::render_action_board(){
     string boardString;//String that will store the board
     for (int i = 0; i < board_size; i++){
         for (int j = 0; j < board_size; j++){
-            boardString += std::to_string(board[i][j]);
+            boardString += to_string(board[i][j]);
         }
         boardString += "\n";//Starts a new line after a row is finished
     }
