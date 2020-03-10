@@ -32,10 +32,18 @@ int get_file_length(ifstream *file){
 void Server::initialize(unsigned int board_size,
                         string p1_setup_board,
                         string p2_setup_board){
+
 }
 
 
 int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
+    if (x>board_size || x < 0){
+        return OUT_OF_BOUNDS;
+    } else if (y>board_size || y < 0){
+        return OUT_OF_BOUNDS;
+    }
+
+
 }
 
 

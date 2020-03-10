@@ -22,25 +22,31 @@ Client::~Client() {
 
 
 void Client::initialize(unsigned int player, unsigned int board_size){
+    
 }
 
 
 void Client::fire(unsigned int x, unsigned int y) {
+
 }
 
 
 bool Client::result_available() {
+
 }
 
 
 int Client::get_result() {
+
 }
 
 
 
 void Client::update_action_board(int result, unsigned int x, unsigned int y) {
+
 }
 
 
 string Client::render_action_board(){
+
 }
