@@ -14,6 +14,12 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+//Help sources used:
+//https://uscilab.github.io/cereal/serialization_archives.html
+//https://stackoverflow.com/questions/47789927/how-to-serialize-multidimensional-array-on-cereal-c-serialize-library?rq=1
+//https://www.javatpoint.com/cpp-int-to-string
+//https://www.geeksforgeeks.org/2d-vector-in-cpp-with-user-defined-size/
+
 #include "common.hpp"
 #include "Client.hpp"
 
@@ -52,7 +58,7 @@ void Client::fire(unsigned int x, unsigned int y) {
 
 
 bool Client::result_available() {
-    return true; //Temporary placeholder so get_result throws no errors
+    return false; //Temporary placeholder so get_result throws no errors
 }
 
 
