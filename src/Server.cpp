@@ -55,13 +55,18 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
 
 int Server::process_shot(unsigned int player) {
     ifstream shotFile("player_" + to_string(player) + ".shot.json");
+    if (!shotFile){
+        return NO_SHOT_FILE;
+    }
     cereal::JSONInputArchive readFile(shotFile);
     int x, y;
     readFile(x, y);
+    ofstream resultFile("player_" + to_string(player) + ".result.json");
+    cereal::JSONOutputArchive cerealArchive(resultFile);
     if (player ==1){
-        return evaluate_shot(2, x, y);
+        cerealArchive(CEREAL_NVP(evaluate_shot(2, x, y)));
     } else {
-        return evaluate_shot(1, x, y);
+        cerealArchive(CEREAL_NVP(evaluate_shot(1, x, y)));
     }
-    return NO_SHOT_FILE;
+    return SHOT_FILE_PROCESSED;
 }
