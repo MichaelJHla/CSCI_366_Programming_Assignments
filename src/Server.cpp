@@ -19,10 +19,10 @@
 //https://stackoverflow.com/questions/47789927/how-to-serialize-multidimensional-array-on-cereal-c-serialize-library?rq=1
 //https://www.javatpoint.com/cpp-int-to-string
 //https://www.geeksforgeeks.org/2d-vector-in-cpp-with-user-defined-size/
+//http://www.cplusplus.com/forum/beginner/11304/
 
 #include "common.hpp"
 #include "Server.hpp"
-
 
 /**
  * Calculate the length of a file (helper function)
@@ -39,17 +39,41 @@ void Server::initialize(unsigned int board_size,
                         string p1_setup_board,
                         string p2_setup_board){
     this->board_size = board_size;
+    if (board_size != BOARD_SIZE){
+        throw ServerException("Incorrect Board Size");
+    }
+    if (p1_setup_board.length() < 1){
+        throw ServerException("No board provided");
+    }
+    if (p2_setup_board.length() < 1){
+        throw ServerException("No board provided");
+    }
 
 }
 
 
 int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
-    if (x>board_size || x < 1){
+    if (x>board_size || x < 0){
         return OUT_OF_BOUNDS;
-    } else if (y>board_size || y < 1){
+    } else if (y>board_size || y < 0){
         return OUT_OF_BOUNDS;
     }
 
+    string line;
+    ifstream boardFile("player_" + to_string(player) + ".setup_board.txt");
+    string arrayOfBoard[board_size];
+    int i = 0;
+    if (boardFile){
+        while (getline(boardFile, line)){
+            arrayOfBoard[i] = line;
+            i++;
+        }
+    }
+    if (arrayOfBoard[y].at(x) != '_'){
+        return HIT;
+    } else{
+        return MISS;
+    }
 }
 
 
