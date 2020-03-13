@@ -48,49 +48,57 @@ void Server::initialize(unsigned int board_size,
     if (p2_setup_board.length() < 1){
         throw ServerException("No board provided");
     }
-
 }
 
-
 int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
-    if (x>board_size || x < 0){
-        return OUT_OF_BOUNDS;
-    } else if (y>board_size || y < 0){
+    //The shot is out of bounds
+    if (x >board_size || x < 0 || y > board_size || y < 0){
         return OUT_OF_BOUNDS;
     }
 
-    string line;
-    ifstream boardFile("player_" + to_string(player) + ".setup_board.txt");
-    string arrayOfBoard[board_size];
-    int i = 0;
-    if (boardFile){
-        while (getline(boardFile, line)){
-            arrayOfBoard[i] = line;
-            i++;
-        }
+    //Checks if the player number is valid or not
+    if (player < 1 || player > MAX_PLAYERS){
+        throw ServerException("Invalid player number");
     }
-    if (arrayOfBoard[y].at(x) != '_'){
+
+    //Switches the player number so the correct board is selected
+    if (player ==1){
+        player = 2;
+    } else {
+        player =1;
+    }
+
+    ifstream boardFile("player_" + to_string(player) + ".setup_board.txt");
+    string line;
+    string arrOfBoard[BOARD_SIZE];
+    int i = 0;
+    while(getline(boardFile, line)){//Assigns each line of the text file to a piece of the array
+        arrOfBoard[i] = line;
+        i++;
+    }
+    if (arrOfBoard[x].at(y) != '_'){//Checks if the tile is a blank tile
         return HIT;
     } else{
         return MISS;
     }
 }
 
-
 int Server::process_shot(unsigned int player) {
+    //Checks if the player number is valid or not
+    if (player < 1 || player > MAX_PLAYERS){
+        throw ServerException("Invalid player number");
+    }
+
     ifstream shotFile("player_" + to_string(player) + ".shot.json");
-    if (!shotFile){
+    if (!shotFile){//Checks if there is an actual file present
         return NO_SHOT_FILE;
     }
     cereal::JSONInputArchive readFile(shotFile);
     int x, y;
-    readFile(x, y);
+    readFile(y, x);
     ofstream resultFile("player_" + to_string(player) + ".result.json");
+    int result = evaluate_shot(player, x, y);
     cereal::JSONOutputArchive cerealArchive(resultFile);
-    if (player ==1){
-        cerealArchive(CEREAL_NVP(evaluate_shot(2, x, y)));
-    } else {
-        cerealArchive(CEREAL_NVP(evaluate_shot(1, x, y)));
-    }
+    cerealArchive(CEREAL_NVP(result));
     return SHOT_FILE_PROCESSED;
 }
