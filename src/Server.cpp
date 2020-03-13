@@ -52,7 +52,7 @@ void Server::initialize(unsigned int board_size,
 
 int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
     //The shot is out of bounds
-    if (x >board_size || x < 0 || y > board_size || y < 0){
+    if (x >= board_size || x < 0 || y >= board_size || y < 0){
         return OUT_OF_BOUNDS;
     }
 
