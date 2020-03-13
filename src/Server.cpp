@@ -56,10 +56,10 @@ void Server::initialize(unsigned int board_size,
         throw ServerException("Incorrect Board Size");
     }
     //Checks the length of the boards to make sure they are large enough
-    if (p1_setup_board.length() < BOARD_SIZE){
+    if (p1Str.length() < BOARD_SIZE){
         throw ServerException("No board provided");
     }
-    if (p2_setup_board.length() < BOARD_SIZE){
+    if (p2Str.length() < BOARD_SIZE){
         throw ServerException("No board provided");
     }
 }
