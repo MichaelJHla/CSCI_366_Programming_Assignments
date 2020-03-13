@@ -27,12 +27,15 @@
 Client::~Client() {
 }
 
+//This method initializes the board as empty
+//It first checks if the player number is valid
+//  then it outputs a blank 2D vector to a JSON file using cereal
 void Client::initialize(unsigned int player, unsigned int board_size){
-    if (player==2 || player==1){ //Checks if the player number is valid
+    if (player < 1 || player > MAX_PLAYERS){ //Checks if the player number is valid
         this->player = player; //Assign valid player number to global player
         this->board_size = board_size; //assign board_size to global board_size
 
-        //create 2D vector for the board
+        //create 2D vector which represents the board
         vector<vector<int>> board(this->board_size, vector<int> (this->board_size, 0));
 
         //creates an output stream with the file name
@@ -48,6 +51,7 @@ void Client::initialize(unsigned int player, unsigned int board_size){
     }
 }
 
+//This method is used to make a JSON file which sends what coordinates are used for a shot
 void Client::fire(unsigned int x, unsigned int y) {
     //Serialize the shot data to the shot.json file
     ofstream shotFile("player_" + to_string(player) + ".shot.json");
@@ -58,20 +62,21 @@ void Client::fire(unsigned int x, unsigned int y) {
 //Checks to see if a JSON with the results of a shot is available to be opened
 bool Client::result_available() {
     ifstream resultFile("player_" + to_string(player) + ".result.json");
-    if (resultFile){
+    if (resultFile){ //Checks if the file was opened succesfully/exists
         return true;
     } else {
         return false;
     }
 }
 
+//This method is used to deserialize the result file and pass the result off to be used by a different method
 int Client::get_result() {
     if (result_available()){ //Checks if a result has been returned yet
         //Deserialize the file
         ifstream resultFile("player_" + to_string(player) + ".result.json");
         cereal::JSONInputArchive readFile(resultFile);
 
-        int result;
+        int result;//Variable used to store the result data
         readFile(result);//Adds the data from the file to the variable
         if (result != HIT && result != MISS && result != OUT_OF_BOUNDS){ //checks to make sure the result is valid
             throw ClientException("Invalid Result");//If not throw a client exception
@@ -80,6 +85,10 @@ int Client::get_result() {
     }
 }
 
+//This method is used to update the active action board with the result of the shot by substituting HIT or MISS
+//It does this by deserializing the json file to a 2d vector
+//After the board is in a 2D vector the x and y coordinate of the shot are updated with the result
+//This updated board is then serialized to a json file that represents the updated action board
 void Client::update_action_board(int result, unsigned int x, unsigned int y) {
     //create 2D vector for the board
     vector<vector<int>> board(this->board_size, vector<int> (this->board_size, 0));
