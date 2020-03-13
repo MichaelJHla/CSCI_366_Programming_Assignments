@@ -56,12 +56,18 @@ void Server::initialize(unsigned int board_size,
         throw ServerException("Incorrect Board Size");
     }
     //Checks the length of the boards to make sure they are large enough
-    if (p1_setup_board.length() < BOARD_SIZE){
+    if (p1Str.length() < BOARD_SIZE){
+        p1Board.close();
+        p2Board.close();
         throw ServerException("No board provided");
     }
-    if (p2_setup_board.length() < BOARD_SIZE){
+    if (p2Str.length() < BOARD_SIZE){
+        p1Board.close();
+        p2Board.close();
         throw ServerException("No board provided");
     }
+    p1Board.close();
+    p2Board.close();
 }
 
 //This method is used to evaluate one player's shot versus the opponents board
@@ -97,6 +103,7 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
         arrOfBoard[i] = line;
         i++;
     }
+    boardFile.close();
     if (arrOfBoard[x].at(y) != '_'){//Checks if the tile is a blank tile
         return HIT;//If it isn't the shot is a hit
     } else{
@@ -115,11 +122,12 @@ int Server::process_shot(unsigned int player) {
     //Checks if the actual file exists
     ifstream shotFile("player_" + to_string(player) + ".shot.json");
     if (!shotFile){//Checks if there is an actual file present
+        shotFile.close();
         return NO_SHOT_FILE;
     }
     //Deserializes the JSON
     cereal::JSONInputArchive readFile(shotFile);
-
+    shotFile.close();
     int x, y; //variables used to store the deserialized shot coordinates
     readFile(y, x);
 
@@ -128,5 +136,6 @@ int Server::process_shot(unsigned int player) {
     int result = evaluate_shot(player, x, y);
     cereal::JSONOutputArchive cerealArchive(resultFile);
     cerealArchive(CEREAL_NVP(result));
+    resultFile.close();
     return SHOT_FILE_PROCESSED;
 }
