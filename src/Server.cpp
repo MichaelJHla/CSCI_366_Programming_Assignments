@@ -20,6 +20,7 @@
 //https://www.javatpoint.com/cpp-int-to-string
 //https://www.geeksforgeeks.org/2d-vector-in-cpp-with-user-defined-size/
 //http://www.cplusplus.com/forum/beginner/11304/
+//https://stackoverflow.com/questions/2602013/read-whole-ascii-file-into-c-stdstring
 
 #include "common.hpp"
 #include "Server.hpp"
@@ -41,6 +42,11 @@ void Server::initialize(unsigned int board_size,
                         string p2_setup_board){
     this->board_size = board_size;//Assigns the board size to the global variable
 
+    //Checks if the passed board_size is valid
+    if (board_size != BOARD_SIZE){
+        throw ServerException("Incorrect Board Size");
+    }
+
     //Turns each text file of the board into a string
     ifstream p1Board(p1_setup_board);
     string p1Str((std::istreambuf_iterator<char>(p1Board)), std::istreambuf_iterator<char>());
@@ -51,10 +57,7 @@ void Server::initialize(unsigned int board_size,
     if (!p1Board || !p2Board){
         throw ServerException("Missing board");
     }
-    //Checks if the passed board_size is valid
-    if (board_size != BOARD_SIZE){
-        throw ServerException("Incorrect Board Size");
-    }
+
     //Checks the length of the boards to make sure they are large enough
     if (p1Str.length() < BOARD_SIZE){
         throw ServerException("No board provided");
@@ -78,7 +81,6 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
     if (x >= board_size || x < 0 || y >= board_size || y < 0){
         return OUT_OF_BOUNDS;
     }
-
 
     //Switches the player number so the correct board is selected
     if (player ==1){
@@ -113,19 +115,25 @@ int Server::process_shot(unsigned int player) {
     }
 
     //Checks if the actual file exists
-    ifstream shotFile("player_" + to_string(player) + ".shot.json");
+    string fileName = "player_" + to_string(player) + ".shot.json"; //String is separated so it can be removed later
+    ifstream shotFile(fileName);
     if (!shotFile){//Checks if there is an actual file present
         return NO_SHOT_FILE;
     }
     //Deserializes the JSON
     cereal::JSONInputArchive readFile(shotFile);
+
     int x, y; //variables used to store the deserialized shot coordinates
     readFile(y, x);
 
+    //Clearing
+    shotFile.close();
+    remove(fileName.c_str());
+
     //This block serializes the code to a result.JSON file
     ofstream resultFile("player_" + to_string(player) + ".result.json");
-    int result = evaluate_shot(player, x, y);
     cereal::JSONOutputArchive cerealArchive(resultFile);
+    int result = evaluate_shot(player, x, y);
     cerealArchive(CEREAL_NVP(result));
     return SHOT_FILE_PROCESSED;
 }

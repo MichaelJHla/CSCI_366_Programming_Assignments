@@ -20,6 +20,7 @@
 //https://www.javatpoint.com/cpp-int-to-string
 //https://www.geeksforgeeks.org/2d-vector-in-cpp-with-user-defined-size/
 //http://www.cplusplus.com/forum/beginner/11304/
+//https://stackoverflow.com/questions/2602013/read-whole-ascii-file-into-c-stdstring
 
 #include "common.hpp"
 #include "Client.hpp"
@@ -35,14 +36,14 @@ void Client::initialize(unsigned int player, unsigned int board_size){
         this->player = player; //Assign valid player number to global player
         this->board_size = board_size; //assign board_size to global board_size
 
-        //create 2D vector which represents the board
-        vector<vector<int>> board(this->board_size, vector<int> (this->board_size, 0));
-
         //creates an output stream with the file name
         ofstream fileName("player_" + to_string(player) + ".action_board.json");
 
         //Serialize blank data to the file
         cereal::JSONOutputArchive cerealArchive(fileName);
+
+        //create 2D vector which represents the board and add it to JSON file
+        vector<vector<int>> board(board_size, vector<int> (board_size, 0));
         cerealArchive(CEREAL_NVP(board));
 
         initialized = true; //Notify the loop that the client has been initialized
@@ -73,11 +74,17 @@ bool Client::result_available() {
 int Client::get_result() {
     if (result_available()){ //Checks if a result has been returned yet
         //Deserialize the file
-        ifstream resultFile("player_" + to_string(player) + ".result.json");
+        string fileName = "player_" + to_string(player) + ".result.json";//Separated so it can be removed later
+        ifstream resultFile(fileName);
         cereal::JSONInputArchive readFile(resultFile);
 
         int result;//Variable used to store the result data
         readFile(result);//Adds the data from the file to the variable
+
+        //Clearing
+        resultFile.close();
+        remove(fileName.c_str());
+
         if (result != HIT && result != MISS && result != OUT_OF_BOUNDS){ //checks to make sure the result is valid
             throw ClientException("Invalid Result");//If not throw a client exception
         }
@@ -90,12 +97,12 @@ int Client::get_result() {
 //After the board is in a 2D vector the x and y coordinate of the shot are updated with the result
 //This updated board is then serialized to a json file that represents the updated action board
 void Client::update_action_board(int result, unsigned int x, unsigned int y) {
-    //create 2D vector for the board
-    vector<vector<int>> board(board_size, vector<int> (board_size, 0));
-
     //deserialize the file
     ifstream inputFileName("player_" + to_string(player) + ".action_board.json");
     cereal::JSONInputArchive readFile(inputFileName);
+
+    //create 2D vector for the board and add board info to it
+    vector<vector<int>> board(board_size, vector<int> (board_size, 0));
     readFile(board);
 
     board[x][y] = result;//update the board with the result
@@ -109,10 +116,10 @@ void Client::update_action_board(int result, unsigned int x, unsigned int y) {
 //This method reads a JSON file and deserializes the JSON
 //It then converts the information to a string and returns that string
 string Client::render_action_board(){
-    ifstream fileName(to_string(player) + ".action_board.json"); //Creates input stream from file
+    ifstream fileName("player_" + to_string(player) + ".action_board.json"); //Creates input stream from file
     cereal::JSONInputArchive readFile(fileName); //deserialize the file
 
-    //2D vector to store the file information
+    //2D vector to store the file information and add board info to it
     vector<vector<int>> board(board_size, vector<int> (board_size, 0));
     readFile(board); //outputs the deserialized file to the board vector
 
