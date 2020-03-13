@@ -31,7 +31,7 @@ Client::~Client() {
 //It first checks if the player number is valid
 //  then it outputs a blank 2D vector to a JSON file using cereal
 void Client::initialize(unsigned int player, unsigned int board_size){
-    if (player < 1 || player > MAX_PLAYERS){ //Checks if the player number is valid
+    if (player > 0 && player < MAX_PLAYERS){ //Checks if the player number is valid
         this->player = player; //Assign valid player number to global player
         this->board_size = board_size; //assign board_size to global board_size
 
