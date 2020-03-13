@@ -19,13 +19,13 @@
 //https://stackoverflow.com/questions/47789927/how-to-serialize-multidimensional-array-on-cereal-c-serialize-library?rq=1
 //https://www.javatpoint.com/cpp-int-to-string
 //https://www.geeksforgeeks.org/2d-vector-in-cpp-with-user-defined-size/
+//http://www.cplusplus.com/forum/beginner/11304/
 
 #include "common.hpp"
 #include "Client.hpp"
 
 Client::~Client() {
 }
-
 
 void Client::initialize(unsigned int player, unsigned int board_size){
     if (player==2 || player==1){ //Checks if the player number is valid
@@ -48,7 +48,6 @@ void Client::initialize(unsigned int player, unsigned int board_size){
     }
 }
 
-
 void Client::fire(unsigned int x, unsigned int y) {
     //Serialize the shot data to the shot.json file
     ofstream shotFile("player_" + to_string(player) + ".shot.json");
@@ -66,7 +65,6 @@ bool Client::result_available() {
     }
 }
 
-
 int Client::get_result() {
     if (result_available()){ //Checks if a result has been returned yet
         //Deserialize the file
@@ -82,10 +80,21 @@ int Client::get_result() {
     }
 }
 
-
-
 void Client::update_action_board(int result, unsigned int x, unsigned int y) {
+    //create 2D vector for the board
+    vector<vector<int>> board(this->board_size, vector<int> (this->board_size, 0));
 
+    //deserialize the file
+    ifstream inputFileName("player_" + to_string(player) + ".action_board.json");
+    cereal::JSONInputArchive readFile(inputFileName);
+    readFile(board);
+
+    board[x][y] = result;//update the board with the result
+
+    //serialize the board to a JSON
+    ofstream outputFileName("player_" + to_string(player) + ".action_board.json");
+    cereal::JSONOutputArchive writeFile(outputFileName);
+    writeFile(CEREAL_NVP(board));
 }
 
 //This method reads a JSON file and deserializes the JSON
