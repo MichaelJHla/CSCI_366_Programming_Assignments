@@ -68,8 +68,17 @@ bool Client::result_available() {
 
 
 int Client::get_result() {
-    if (result_available()){
+    if (result_available()){ //Checks if a result has been returned yet
+        //Deserialize the file
+        ifstream resultFile("player_" + to_string(player) + ".result.json");
+        cereal::JSONInputArchive readFile(resultFile);
 
+        int result;
+        readFile(result);//Adds the data from the file to the variable
+        if (result != HIT && result != MISS && result != OUT_OF_BOUNDS){ //checks to make sure the result is valid
+            throw ClientException("Invalid Result");//If not throw a client exception
+        }
+        return result;
     }
 }
 
