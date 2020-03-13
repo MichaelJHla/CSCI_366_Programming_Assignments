@@ -46,6 +46,8 @@ void Client::initialize(unsigned int player, unsigned int board_size){
         cerealArchive(CEREAL_NVP(board));
 
         initialized = true; //Notify the loop that the client has been initialized
+
+        fileName.close();
     } else {
         throw ClientWrongPlayerNumberException(); //if not valid throw exception
     }
@@ -57,14 +59,18 @@ void Client::fire(unsigned int x, unsigned int y) {
     ofstream shotFile("player_" + to_string(player) + ".shot.json");
     cereal::JSONOutputArchive cerealArchive(shotFile);
     cerealArchive(CEREAL_NVP(x), CEREAL_NVP(y));
+
+    shotFile.close();
 }
 
 //Checks to see if a JSON with the results of a shot is available to be opened
 bool Client::result_available() {
     ifstream resultFile("player_" + to_string(player) + ".result.json");
     if (resultFile){ //Checks if the file was opened succesfully/exists
+        resultFile.close();
         return true;
     } else {
+        resultFile.close();
         return false;
     }
 }
@@ -78,6 +84,7 @@ int Client::get_result() {
 
         int result;//Variable used to store the result data
         readFile(result);//Adds the data from the file to the variable
+        resultFile.close();
         if (result != HIT && result != MISS && result != OUT_OF_BOUNDS){ //checks to make sure the result is valid
             throw ClientException("Invalid Result");//If not throw a client exception
         }
@@ -91,7 +98,7 @@ int Client::get_result() {
 //This updated board is then serialized to a json file that represents the updated action board
 void Client::update_action_board(int result, unsigned int x, unsigned int y) {
     //create 2D vector for the board
-    vector<vector<int>> board(this->board_size, vector<int> (this->board_size, 0));
+    vector<vector<int>> board(board_size, vector<int> (board_size, 0));
 
     //deserialize the file
     ifstream inputFileName("player_" + to_string(player) + ".action_board.json");
@@ -123,5 +130,6 @@ string Client::render_action_board(){
         }
         boardString += "\n";//Starts a new line after a row is finished
     }
+    fileName.close();
     return boardString;//Returns the board as a string
 }
