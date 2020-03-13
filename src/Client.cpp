@@ -58,8 +58,7 @@ void Client::fire(unsigned int x, unsigned int y) {
 
 //Checks to see if a JSON with the results of a shot is available to be opened
 bool Client::result_available() {
-    ifstream resultFile;
-    resultFile.open("player_" + to_string(player) + ".result.json");
+    ifstream resultFile("player_" + to_string(player) + ".result.json");
     if (resultFile){
         return true;
     } else {
