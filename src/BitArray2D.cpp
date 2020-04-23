@@ -18,6 +18,10 @@
 #include "BitArray2D.hpp"
 
 BitArray2D::BitArray2D(unsigned int rows, unsigned int columns) {
+    if (rows < 1 || columns < 1){
+        throw BitArray2DException("Too small row or column number");
+    }
+
     this->rows = rows;
     this->columns = columns;
 
