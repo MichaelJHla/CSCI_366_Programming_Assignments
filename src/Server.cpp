@@ -63,8 +63,25 @@ void Server::initialize(unsigned int board_size,
 Server::~Server() {
 }
 
-
 BitArray2D *Server::scan_setup_board(string setup_board_name){
+    BitArray2D *board = new BitArray2D(board_size, board_size);
+    ifstream boardFile(setup_board_name);
+    if (!boardFile){
+        throw ServerException("Bad board name");
+    }
+
+    string line;
+    for (int i = 0; i < board_size; i++){
+        getline(boardFile, line);
+        for (int j = 0; j<line.length(); j++){
+            for (char ship : SHIPS){
+                if (line.at(j) == ship){
+                    board->set(j, i); //Reverse the order since i represents the current line
+                }
+            }
+        }
+    }
+    return board;
 }
 
 //This method is used to evaluate one player's shot versus the opponents board
@@ -83,26 +100,17 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
     }
 
     //Switches the player number so the correct board is selected
-    if (player ==1){
-        player = 2;
+    char shot;
+    if (player == 1){
+        shot = p2_setup_board->get(x, y);
     } else {
-        player =1;
+        shot = p1_setup_board->get(x, y);
     }
 
-    //deserialize the opposing player's setup board
-    ifstream boardFile("player_" + to_string(player) + ".setup_board.txt");
-    string line;
-    string arrOfBoard[BOARD_SIZE];//Creates an array that is the size of one edge of the board
-
-    int i = 0; //Integer for indexing
-    while(getline(boardFile, line)){//Assigns each line of the text file to a piece of the array
-        arrOfBoard[i] = line;
-        i++;
-    }
-    if (arrOfBoard[x].at(y) != '_'){//Checks if the tile is a blank tile
-        return HIT;//If it isn't the shot is a hit
+    if (shot == 1){
+        return HIT;
     } else{
-        return MISS; //Otherwise it is a miss
+        return MISS;
     }
 }
 
