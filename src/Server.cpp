@@ -40,24 +40,17 @@ void Server::initialize(unsigned int board_size,
         throw ServerException("Incorrect Board Size");
     }
 
-    //Turns each text file of the board into a string
+    //Load eac board to see if it exists
     ifstream p1Board(p1_setup_board);
-    string p1Str((std::istreambuf_iterator<char>(p1Board)), std::istreambuf_iterator<char>());
     ifstream p2Board(p2_setup_board);
-    string p2Str((std::istreambuf_iterator<char>(p2Board)), std::istreambuf_iterator<char>());
 
     //If a board does not exist throw a ServerException
     if (!p1Board || !p2Board){
         throw ServerException("Missing board");
     }
 
-    //Checks the length of the boards to make sure they are large enough
-    if (p1Str.length() < BOARD_SIZE){
-        throw ServerException("No board provided");
-    }
-    if (p2Str.length() < BOARD_SIZE){
-        throw ServerException("No board provided");
-    }
+    this->p1_setup_board = scan_setup_board(p1_setup_board);
+    this->p2_setup_board = scan_setup_board(p2_setup_board);
 }
 
 Server::~Server() {
