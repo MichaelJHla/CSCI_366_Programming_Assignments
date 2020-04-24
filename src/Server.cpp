@@ -49,6 +49,7 @@ void Server::initialize(unsigned int board_size,
         throw ServerException("Missing board");
     }
 
+    //These two calls will allocate the proper space needed in memory
     this->p1_setup_board = scan_setup_board(p1_setup_board);
     this->p2_setup_board = scan_setup_board(p2_setup_board);
 }
@@ -56,25 +57,26 @@ void Server::initialize(unsigned int board_size,
 Server::~Server() {
 }
 
+//This method is used to setup a board in registers
 BitArray2D *Server::scan_setup_board(string setup_board_name){
     BitArray2D *board = new BitArray2D(board_size, board_size);
     ifstream boardFile(setup_board_name);
-    if (!boardFile){
+    if (!boardFile){// If the board does not exist
         throw ServerException("Bad board name");
     }
 
-    string line;
+    string line;//Used for parsing
     for (int i = 0; i < board_size; i++){
-        getline(boardFile, line);
+        getline(boardFile, line);//Get the next line of the input
         for (int j = 0; j<line.length(); j++){
-            for (char ship : SHIPS){
-                if (line.at(j) == ship){
+            for (char ship : SHIPS){ //goes through each ship in the list of ships
+                if (line.at(j) == ship){// If the char in the current line is a ship, then set that on the board
                     board->set(j, i); //Reverse the order since i represents the current line
                 }
             }
         }
     }
-    return board;
+    return board; //Returns the pointer to the BitArray2D
 }
 
 //This method is used to evaluate one player's shot versus the opponents board
@@ -93,7 +95,7 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
     }
 
     //Switches the player number so the correct board is selected
-    char shot;
+    int shot; //This will contain the byte saying if the shot was a hit or not
     if (player == 1){
         shot = p2_setup_board->get(x, y);
     } else {
