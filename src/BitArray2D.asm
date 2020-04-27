@@ -2,6 +2,9 @@
         global  set_bit_elem
         global  get_bit_elem
         section .text
+;Source used for assembly help https://cs.brown.edu/courses/cs033/docs/guides/x64_cheatsheet.pdf
+;https://docs.oracle.com/cd/E19120-01/open.solaris/817-5477/eoizi/index.html
+;http://patshaughnessy.net/2017/1/20/pointers-in-c-and-x86-assembly-language
 
 set_bit_elem:
         push rbp            ; save the base pointer on the stack (at rsp+8)
